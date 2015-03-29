@@ -30,18 +30,27 @@ public class Actions {
      * @param value A string
      * @return a cleaned string
      */
-    public static String removeSpecialChars(String value){
+    public static String removeSpecialChars(String value,char[] exceptions){
         String cleanedString="";
+        if (value==null) return null;
         for (int index=0;index<value.length();index++){
-            if(value.charAt(index)==',' || value.charAt(index)==' ' || Character.isAlphabetic(value.charAt(index))){
+            if(Character.isDigit(value.charAt(index))|| Character.isAlphabetic(value.charAt(index))){
                 cleanedString+=String.valueOf(value.charAt(index));
             }
-            if(value.charAt(index)==':'){
-                cleanedString+=" ";
+            if(exceptions!=null){
+                for (int i=0;i<exceptions.length;i++){
+                    if (value.charAt(index)==exceptions[i]){
+                        cleanedString+=String.valueOf(value.charAt(index));
+                    }
+                }
             }
-            if(Character.isDigit(value.charAt(index))) cleanedString+=String.valueOf(value.charAt(index));
         }
         return cleanedString;
+    }
+
+    public static String removeSpecialChars(String value){
+        char[] exceptions=null;
+        return removeSpecialChars(value,exceptions);
     }
 
     /**

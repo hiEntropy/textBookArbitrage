@@ -266,7 +266,7 @@ public class Departments {
                             if (!uniqueBooks.contains(currentBook)) {
                                 try {
                                     Amazon amazon = new
-                                            Amazon(currentBook.getIsbn(), "kgxz2js+N6wdWVAqJir5nGXhkMoPoHgU5nJl/YTc", "AKIAJZCB3IYOGUMGG23A");
+                                            Amazon(currentBook.getIsbn(), "4Fa2FNqU0gLHOdESbVJsVgnLuCCvnKiKP5tjdAUZ", "AKIAIL5UKVGTZINL2N3Q");
                                     amazon.queryAmazon();
                                     currentBook.setAzUsedPrice(amazon.getLowestUsedPrice());
                                     currentBook.setAzNewPrice(amazon.getLowestNewPrice());
