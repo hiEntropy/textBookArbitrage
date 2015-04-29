@@ -1,6 +1,3 @@
-import com.sun.org.apache.xpath.internal.SourceTree;
-import sun.util.resources.cldr.es.CalendarData_es_AR;
-
 /**
  * Created by Austin on 3/21/2015.
  */
@@ -18,7 +15,7 @@ public class Main {
                 String fileName=Actions.formatTermYear(term,year)+".txt";
                 Departments departments1=new Departments(term,year);
                 departments1.load(fileName);
-                departments1.makeFinalReport();
+                departments1.reportROIRanks();
                 departments1.reportPriceDifferences();
                 System.out.println("Data for "+term+" "+year+" successfully loaded.");
             }
@@ -32,7 +29,7 @@ public class Main {
                 System.out.println("Beginning... You may want to go do something else while I work");
                 departments.requestDataFromWWU();
                 departments.getAmazonPrices();
-                departments.makeFinalReport();
+                departments.reportROIRanks();
                 departments.reportPriceDifferences();
             }
 
@@ -48,6 +45,7 @@ public class Main {
         System.out.println("Options");
         System.out.println("<1> Load Existing and Generate Reports");
         System.out.println("<2> Request Data From WWU and Amazon (get new data)");
+        System.out.println("<3> Collect Data");
         System.out.println("<Quit> to stop the application");
     }
 

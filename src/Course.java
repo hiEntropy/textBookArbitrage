@@ -26,6 +26,11 @@ public class Course {
         return true;
     }
 
+    /**
+     *
+     * @return
+     */
+
     public String getCourseCode(){
         return courseCode;
     }

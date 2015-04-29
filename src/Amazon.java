@@ -75,10 +75,10 @@ public class Amazon{
      * @param response
      */
     private void getPrices(Document response){
-        inspectXML(response.getChildNodes(), "LowestUsedPrice", "Amount");
+        Actions.inspectXML(response.getChildNodes(), "LowestUsedPrice", "Amount",prices);
         lowestUsedPrice=Actions.lowestNumber(prices);
         prices.clear();
-        inspectXML(response.getChildNodes(), "LowestNewPrice", "Amount");
+        Actions.inspectXML(response.getChildNodes(), "LowestNewPrice", "Amount",prices);
         lowestNewPrice=Actions.lowestNumber(prices);
         prices.clear();
     }
@@ -108,38 +108,5 @@ public class Amazon{
             e.printStackTrace();
         }
         return doc;
-    }
-
-    private static void printResponse(Document doc) throws TransformerException, FileNotFoundException {
-        Transformer trans = TransformerFactory.newInstance().newTransformer();
-        Properties props = new Properties();
-        props.put(OutputKeys.INDENT, "yes");
-        trans.setOutputProperties(props);
-        StreamResult res = new StreamResult(new StringWriter());
-        DOMSource src = new DOMSource(doc);
-        trans.transform(src, res);
-        String toString = res.getWriter().toString();
-        System.out.println(toString);
-    }
-
-
-    private boolean inspectXML(NodeList nodeList,String endTag,String nestTag){
-        if (nodeList.getLength()==0)return false;
-        for (int i=0; i< nodeList.getLength();i++){
-            if (nodeList.item(i).getNodeName().equals(endTag)){
-                NodeList lowestPriceList=nodeList.item(i).getChildNodes();
-                for(int items=0;items<lowestPriceList.getLength();items++){
-                    if (lowestPriceList.item(items).getNodeName().equals(nestTag)){
-                        String price=lowestPriceList.item(items).getTextContent();
-                        if (!price.isEmpty() && !price.equals(null) && Actions.isNumeric(price)){
-                            prices.add(Double.valueOf(price));
-                            return true;
-                        }
-                    }
-                }
-            }
-            inspectXML(nodeList.item(i).getChildNodes(),endTag,nestTag);
-        }
-        return false;
     }
 }

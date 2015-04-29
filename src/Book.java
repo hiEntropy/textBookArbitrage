@@ -1,4 +1,6 @@
-import java.util.Comparator;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by Austin on 3/8/2015.
@@ -12,18 +14,24 @@ public class Book implements Comparator{
     private double azNewPrice;
     private double profit;
     private boolean isMandatory;
-
+    private Map<String,Double> historicPricesAz;
+    private Map<String,Double> historicPricesWwu;
     private Section parent;
     private double ROI;
+    private String currentDate;
 
-    public Book(String title,String isbn, boolean isMandatory,double newPrice, double usedPrice,Section parent){
-        this.isbn=isbn;
-        this.isMandatory=isMandatory;
-        this.wwuUsedPrice =usedPrice;
-        this.wwuNewPrice =newPrice;
-        this.title=title;
-        this.parent=parent;
+    public Book(String title,String isbn, boolean isMandatory,double newPrice, double usedPrice,Section parent) {
+        this.isbn = isbn;
+        this.isMandatory = isMandatory;
+        this.wwuUsedPrice = usedPrice;
+        this.wwuNewPrice = newPrice;
+        this.title = title;
+        this.parent = parent;
+        this.historicPricesAz = new TreeMap<String, Double>();
+        this.historicPricesWwu= new TreeMap<String, Double>();
+        this.currentDate=getCurrentDate();
     }
+
     public  Section getParent(){return parent;}
 
     public String getTitle(){
@@ -48,6 +56,10 @@ public class Book implements Comparator{
 
     public double getROI(){return ROI;}
 
+    public Map<String,Double> getHistoricPricesAz(){return historicPricesAz;}
+
+    public Map<String,Double> getHistoricPricesWwu(){return historicPricesWwu;}
+
     public void setAzUsedPrice(double price){
         azUsedPrice=price;
     }
@@ -60,8 +72,22 @@ public class Book implements Comparator{
         this.title=title;
     }
 
+    public void addHistoricPriceAz(double value){historicPricesAz.put(currentDate, value);}
+
+    public void addHistoricPriceAz(String key, double value){historicPricesAz.put(key,value);}
+
+    public void addHistoricPriceWwu(double value){historicPricesWwu.put(currentDate,value);}
+
+    public void addHistoricPriceWwu(String key,double value){historicPricesWwu.put(key,value);}
+
     public String getIsbn(){
         return isbn;
+    }
+
+    public String getCurrentDate(){
+        DateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd");
+        Date date= new Date();
+        return dateFormat.format(date);
     }
 
     /**
@@ -102,7 +128,6 @@ public class Book implements Comparator{
      * @return -1 if one<two 0 if one==two 1 if one>two
      * @throws throws a ClassCastException if the two objects are not the same type of object
      */
-
     public int compare(Object one,Object two){
         if (one instanceof Book && two instanceof Book){
             if (((Book) one).getROI()<((Book) two).getROI()){return -1;}

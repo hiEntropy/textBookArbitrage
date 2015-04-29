@@ -8,18 +8,23 @@ import java.util.*;
 /**
  Needed Improvements:
  *See individual method note for improvements.
- */
+ **/
 public class Departments {
     //master storage for all departments
     private Map<String,Department> departments;
     //This is built from instantiate() or populateBooksFromWWU() functions depending on the desired execution
     private ArrayList<Book> uniqueBooks;
     private String term;
+    String title;
+    String sku;
+    String newBookPrice;
+    String usedBookPrice;
+    String bookStatus;
     private JSONObject holder;
     private JSONArray bookHolder;
     private int bookCount;
-    private String year;
     private int booksQueried=0;
+    private List<Map<String,String>>list;
 
     public Departments(String term, String year){
         this.term=Actions.formatTermYear(term,year);
@@ -28,6 +33,7 @@ public class Departments {
         bookHolder= new JSONArray();
         uniqueBooks=new ArrayList<Book>();
         bookCount=0;
+        list= new ArrayList<Map<String, String>>();
         try {
             holder.put("data",bookHolder);
         } catch (JSONException e) {
@@ -85,7 +91,7 @@ public class Departments {
 
     public boolean reportPriceDifferences(){
         PriorityQueue<Book> books=getPriorityQueueByCostDifference();
-        String fileName=Actions.fileNameAssignment("price_differences_"+term,".txt");
+        String fileName=Actions.fileNameAssignment("price_differences_report_"+term,".txt");
         double amazonCheaper=0;
         double wwuCheaper=0;
         double amazonNoOffer=0;//This is the amount of times the WWU has the book used but amazon does not
@@ -134,21 +140,24 @@ public class Departments {
         return false;
     }
 
-    public boolean makeFinalReport(){
+    public boolean reportROIRanks(){
         PriorityQueue<Book> books=getPriorityQueueByROI();
-        String fileName=Actions.fileNameAssignment("FinalReport_"+term,".txt");
+        String fileName=Actions.fileNameAssignment("ROIRankReport_"+term,".txt");
         if (books!=null) {
             String saveString =
-                    String.format(" %-15s %-14s %-14s %-14s %-15s", "ISBN", "Amazon", "WWU", "Profit", "ROI");
+                    String.format("%-15s %-15s %-15s %-14s %-14s %-14s %-15s","Dept","Course", "ISBN", "Amazon", "WWU", "Profit", "ROI");
             String formattedData = "";
             while (books.peek() != null) {
                 Book current = books.poll();
                 String isbn = current.getIsbn();
+                String dept= current.getParent().getParent().getParent().getDepartmentCode();
+                String course=current.getParent().getParent().getCourseCode();
                 double azUsedPrice = current.getAzUsedPrice();
                 double wwuUsedPrice = current.getWwuUsedPrice();
                 double profit = current.getProfit();
                 double ROI = current.getROI() * 100;
-                formattedData = "\n\n" + String.format("%-15s $%-14.2f $%-14.2f $%-14.2f %-13.2f", isbn, azUsedPrice, wwuUsedPrice, profit, ROI) + "\n";
+                formattedData = "\n\n" + String.format("%-15s %-15s %-15s$%-14.2f $%-14.2f $%-14.2f %-13.2f",dept, course,
+                        isbn, azUsedPrice, wwuUsedPrice, profit, ROI) + "\n";
                 saveString += formattedData;
             }
             if (Actions.save(saveString, fileName)) {
@@ -167,7 +176,7 @@ public class Departments {
     /**
      * This is a procedural method for extracting new data from the Western Washington University Bookstore's web server
      * this will write a new JSON file of data to the disk.
-     */
+     **/
     public void requestDataFromWWU(){
         boolean deptStatus= populateDepartmentsFromWWU();
         System.out.println("Departments Loaded "+deptStatus);
@@ -196,7 +205,7 @@ public class Departments {
      The book data is stored under the book tag.  The next JSONArray is created out of the book tag.  The book data
      is then extracted from the tag and passed to a map of keys and values.  The JSONKey is used as the map key and the
      map is passed to the instantiate().
-     */
+     **/
     public void load(String location){
         String savedData=Actions.readFile(location);
         Map<String,String> map= new HashMap<String, String>();
@@ -231,14 +240,16 @@ public class Departments {
      The getAmazonPrices() function cycles through all books and contacts the amazon product api in order to get the
      lowest used and new price for each book.  Currently this function ignores repeat requests for the same isbn which
      will be corrected.  The requests are only allowed once every second and the function limits the requests further by
-     limiting sleeping program execution for 2*1000 milliseconds 2 seconds.  Requests are limited further to
-     avoid HTTP 503 errors.  The unfortunate part of this increased reliability is that the maximum request per hour
-     falls to 1800 per hour instead of the full 3600.  Thankfully once we get the once duplicated requests are ignored
+     limiting sleeping program execution for 2*1000 milliseconds 2 seconds.  This method limits requests are limited further to
+     avoid HTTP 503 errors being generated by the Amazon server.  The unfortunate part of this increased reliability
+     is that the maximum request per hour
+     falls to 1800 per hour instead of the full 3600 which makes the full execution of this part of the algorithm approximately
+     45 minutes.  Thankfully once we get the once duplicated requests are ignored
      the reduction in maximum requests per hour should not hurt efficiency to bad.
 
      Improvements to be made:
      since we have a list of unique books we can refactor this to not require iteration through the entire set.
-     the uniqueBooks list could be used instead saving the trouble of iterating over everthing again.
+     the uniqueBooks list could be used instead saving the trouble of iterating over everything again.
      */
 
     public void getAmazonPrices(){
@@ -266,11 +277,13 @@ public class Departments {
                             if (!uniqueBooks.contains(currentBook)) {
                                 try {
                                     Amazon amazon = new
-                                            Amazon(currentBook.getIsbn(), "4Fa2FNqU0gLHOdESbVJsVgnLuCCvnKiKP5tjdAUZ", "AKIAIL5UKVGTZINL2N3Q");
+                                            Amazon(currentBook.getIsbn(), "apiKey", "awsKey");
                                     amazon.queryAmazon();
-                                    currentBook.setAzUsedPrice(amazon.getLowestUsedPrice());
+                                    double lowestAZPrice=amazon.getLowestNewPrice();
+                                    currentBook.setAzUsedPrice(lowestAZPrice);
+                                    currentBook.addHistoricPriceAz(lowestAZPrice);
                                     currentBook.setAzNewPrice(amazon.getLowestNewPrice());
-                                    Thread.sleep(2 * 1000);
+                                    Thread.sleep((long)1.1*1000);
                                     booksQueried+=1;
                                     addToUniqueBooks(currentBook);
                                     System.out.println(booksQueried);
@@ -289,6 +302,8 @@ public class Departments {
             System.out.println("Content Saved "+saveStatus);
         }
     }
+
+
     /**
      This function is really part of the load function.  It was placed in its own method for the sake of possible
      code re-use in the future.  It is conceivable that the necessity to make an instance of a book and all of its
@@ -303,11 +318,26 @@ public class Departments {
         Section currentSection=new Section(map.get("sectionCode"),currentCourse);
         Book currentBook=new Book(map.get("title"),map.get("isbn"),Actions.bookStatus(map.get("bookStatus")),
                 Double.valueOf(map.get("newBookPrice")),Double.valueOf(map.get("usedBookPrice")),currentSection);
-        if(map.containsKey("azUsedPrice")){
-            currentBook.setAzUsedPrice(Double.valueOf(map.get("azUsedPrice")));
-            currentBook.setProfitAndROI();
+        Iterator mapIterator= map.keySet().iterator();
+        while (mapIterator.hasNext()){
+            Map.Entry current=(Map.Entry)mapIterator.next();
+            String key= (String)current.getKey();
+            if (key.contains("azPrice")){
+                key=key.substring(7,key.length());
+                currentBook.addHistoricPriceAz(key,(Double)current.getValue());
+            }
+            else if (key.contains("wwuPrice")){
+                key=key.substring(8,key.length());
+                currentBook.addHistoricPriceWwu(key,(Double)current.getValue());
+                currentBook.setProfitAndROI();
+            }
+            else if (key.equals("azUsedPrice")){
+                currentBook.setAzNewPrice(Double.valueOf(((String)current.getValue())));
+            }
+            else if(key.equals("azNewPrice")){
+                currentBook.setAzNewPrice(Double.valueOf((String)current.getValue()));
+            }
         }
-        if(map.containsKey("azNewPrice")) currentBook.setAzNewPrice(Double.valueOf(map.get("azNewPrice")));
         //if there is an object already created these
         // if statements will replace the new one with the old one.
         //ALso if there isn't a dept course or section this will add a new one.
@@ -454,15 +484,14 @@ public class Departments {
     /**
      * Gets the book data from WWU books store.  This is dependent on having run the populateDepartmentsFromWWU(),
      * populateCoursesFromWWU() and populateSectionsFromWWU() being run.
-     * unlike the previoulsy mentioned functions this function implements the first steps in the automated save process.
+     * unlike the previously mentioned functions this function implements the first steps in the automated save process.
      *
      * Improvements:
      * The JSON parsing could be done in a more elegant way similar to the XML parsing
      * @return
-     */
+     **/
     private boolean populatedBooksFromWWU(){
         URL url=null;
-        int key=0;
         Iterator iterator= departments.entrySet().iterator();
         try {
             while (iterator.hasNext()) {
@@ -485,29 +514,40 @@ public class Departments {
                                     "&store=444&dti=YES&desc=&bSug=YES&cSug=&H=N");
                             String jsonSTR=Actions.getTXTFromURL(url);
                             JSONObject jsonObject = new JSONObject(jsonSTR);
-                            //This gets the data that will apply to both the new and used book
-                            JSONArray data = jsonObject.getJSONObject("course").getJSONArray("books");
-                            for (int books = 0; books < data.length(); books++) {//Checks for multiple books
-                                JSONObject dataLevel1 = data.getJSONObject(books);
-                                String title = dataLevel1.getString("title");
+                            Actions.parseJSON(jsonObject,"books",list);
+                            //finding title
+                            for (int listIndex=0;listIndex<list.size();listIndex++){
+                                if (list.get(listIndex).containsKey("title")){
+                                    title=list.get(listIndex).get("title");
+                                }
+                            }
                                 if(!title.toLowerCase().equals("no books found")) {
-                                    //String isbn = dataLevel1.getString("isbn");
-                                    String bookStatus = dataLevel1.getString("bookstatus");
-                                    //NEW Book Info
-                                    JSONObject dataNewBook = dataLevel1.getJSONArray("details").getJSONObject(0);
-                                    String newBookPrice = dataNewBook.getString("price");
-                                    String sku = dataNewBook.getString("sku");
-                                    //USED BOOK INFO:
-                                    JSONObject dataUsedBook = dataLevel1.getJSONArray("details").getJSONObject(1);
-                                    String usedBookPrice = dataUsedBook.getString("price");
+                                    for (int listIndex=0;listIndex<list.size();listIndex++){
+                                        //data that is the same for new and used books
+                                        if (list.get(listIndex).containsKey("title")){
+                                            sku=list.get(listIndex).get("sku");
+                                        }
+                                        //data applicable to used books only
+                                        if (list.get(listIndex).get("isUsed")=="1"){
+                                            usedBookPrice=list.get(listIndex).get("salePrice");
+
+                                        }
+                                        //data applicable to new books only
+                                        if (list.get(listIndex).get("isNew")=="1"){
+                                            newBookPrice=list.get(listIndex).get("salePrice");
+                                        }
+                                    }
+                                    //Data points collected are bookStatus,sku,title,newBookPrice,usedBookPrice,
+                                    //
                                     Book currentBook= new Book(title, sku, Actions.bookStatus(bookStatus),
                                             Double.valueOf(newBookPrice), Double.valueOf(usedBookPrice),currentSection);
                                     currentSection.addBook(currentBook);
+                                    currentBook.addHistoricPriceWwu(Double.valueOf(usedBookPrice));
                                     // start of the save process
                                     save(currentBook);
                                     //end of the save process
                                 }
-                            }
+
                         }
                     }
                 }
@@ -520,6 +560,8 @@ public class Departments {
         }
         return true;
     }
+
+
 
     /**
      * This is used in the instantiate() and getAmazonPrices().  The objective of the uniqueBooks ArrayList<Book> is to
