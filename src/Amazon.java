@@ -43,7 +43,7 @@ public class Amazon{
     }
 
     /**
-     * retrieves a response from Amazon via the product advertising api, converts the response to an xml document
+     * retrieves a response from Amazon via the product advertising api, converts the response to an xml document1
      * and passes it to the getPrices() to extract the new lowest new and used prices for the give isbn
      */
 
@@ -92,7 +92,7 @@ public class Amazon{
     }
 
     /**
-     * This returns an XML document for the inspectXML() to parse.
+     * This returns an XML document1 for the inspectXML() to parse.
      * @param url
      * @return Document
      * @throws ParserConfigurationException

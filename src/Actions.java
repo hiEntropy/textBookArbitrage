@@ -69,6 +69,7 @@ public class Actions {
      * well throw another JSONException instead of adding another try catch statement to the mix
      */
     public static void parseJSON(JSONObject jsonObject,String target,List<Map<String,String>>list)throws JSONException{
+        if (jsonObject==null)return;
         Iterator iterator= jsonObject.keys();
         String key;
         while(iterator.hasNext()){
@@ -252,6 +253,14 @@ public class Actions {
         return null;
     }
 
+    /**
+     * Untested
+     * @param nodeList
+     * @param endTag
+     * @param nestTag
+     * @param list
+     * @return
+     */
     public static boolean XmlParser(NodeList nodeList,String endTag,String nestTag,List<String> list){
         if (nodeList.getLength()==0)return false;
         for (int i=0; i< nodeList.getLength();i++){
@@ -292,6 +301,11 @@ public class Actions {
         return false;
     }
 
+    /**
+     * Takes a XML document1 and prints out the document1 to the console
+     * @param doc
+     * @throws TransformerException
+     */
     public static void printXMLResponse(Document doc) throws TransformerException{
         try {
             Transformer trans = TransformerFactory.newInstance().newTransformer();
@@ -389,9 +403,9 @@ public class Actions {
 
     /**
      * Takes a string and file location and saves it to the specified location
-     * @param value
-     * @param location
-     * @return
+     * @param value String of input that needs to be saved
+     * @param location String representation of the file location
+     * @return true if the write is complete otherwise false
      */
     public static boolean save(String value, String location) {
         return write(value,location);
@@ -411,8 +425,8 @@ public class Actions {
     /**
      * Takes a Map<String,String> then formats keys and value to the specified save format for the load() function in
      * Departments to read in the future.
-     * @param data
-     * @return
+     * @param data map of strings
+     * @return a JSON object
      **/
     public static JSONObject convertToJson(Map<String,String> data){
         try {
@@ -435,7 +449,7 @@ public class Actions {
 
     /**
      * Takes a url and reads the response, converts the response to text and returns it.
-     * @param url
+     * @param url as defined in the URL class
      * @return String
      **/
     public static String getTXTFromURL(URL url){
@@ -458,7 +472,7 @@ public class Actions {
     /**
      * This function reads a specified file and returns the a string of the file.  This is used to read saved JSON in the
      * Departments load()
-     * @param location
+     * @param location String file location
      * @return String
      **/
     public static String readFile(String location){
@@ -481,8 +495,8 @@ public class Actions {
 
     /**
      *
-     * @param value
-     * @return
+     * @param value String of chars
+     * @return true if there is a single digit otherwise false
      */
     public static boolean isNumeric(String value){
         for (int i=0;i<value.length();i++){
@@ -496,7 +510,7 @@ public class Actions {
      * convertToJson() so that it can be saved.
      * @param book
      * @return map representing the data describing the book
-     */
+     **/
     public static Map<String,String> bookToMap(Book book){
         Map<String,String> map= new HashMap<String, String>();
         Section section=book.getParent();
@@ -509,8 +523,8 @@ public class Actions {
         map.put("instructor",section.getInstructor());
         map.put("title",book.getTitle());
         map.put("isbn",book.getIsbn());
-        map.put("usedBookPrice",String.valueOf(book.getWwuUsedPrice()));
-        map.put("newBookPrice",String.valueOf(book.getWwuNewPrice()));
+        map.put("wwuUsedPrice",String.valueOf(book.getWwuUsedPrice()));
+        map.put("wwuNewPrice",String.valueOf(book.getWwuNewPrice()));
         map.put("azUsedPrice",String.valueOf(book.getAzUsedPrice()));
         map.put("azNewPrice",String.valueOf(book.getAzNewPrice()));
         map.put("bookStatus",String.valueOf(book.getIsMandatory()));
@@ -547,7 +561,7 @@ public class Actions {
      * @param value ArrayList<Double>
      * @return double lowest in the ArrayList
      */
-    public static double lowestNumber(ArrayList<Double> value){
+    public static double lowestNumber(List<Double> value){
         if(value.size()<1) return  -1.00;
         double lowest=value.get(0);
         for (int i=0; i<value.size();i++){

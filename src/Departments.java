@@ -277,11 +277,10 @@ public class Departments {
                             if (!uniqueBooks.contains(currentBook)) {
                                 try {
                                     Amazon amazon = new
-                                            Amazon(currentBook.getIsbn(), "apiKey", "awsKey");
+                                            Amazon(currentBook.getIsbn(), "4Fa2FNqU0gLHOdESbVJsVgnLuCCvnKiKP5tjdAUZ", "AKIAIL5UKVGTZINL2N3Q");
                                     amazon.queryAmazon();
-                                    double lowestAZPrice=amazon.getLowestNewPrice();
-                                    currentBook.setAzUsedPrice(lowestAZPrice);
-                                    currentBook.addHistoricPriceAz(lowestAZPrice);
+                                    currentBook.setAzUsedPrice(amazon.getLowestUsedPrice());
+                                    currentBook.addHistoricPriceAz(amazon.getLowestUsedPrice());
                                     currentBook.setAzNewPrice(amazon.getLowestNewPrice());
                                     Thread.sleep((long)1.1*1000);
                                     booksQueried+=1;
@@ -303,6 +302,28 @@ public class Departments {
         }
     }
 
+    public void getAmazonPricesFromLoad(){
+        for (int book=0;book<uniqueBooks.size();book++) {
+            Book currentBook=uniqueBooks.get(book);
+            try {
+                Amazon amazon = new
+                        Amazon(currentBook.getIsbn(), "4Fa2FNqU0gLHOdESbVJsVgnLuCCvnKiKP5tjdAUZ", "AKIAIL5UKVGTZINL2N3Q");
+                amazon.queryAmazon();
+                currentBook.setAzUsedPrice(amazon.getLowestUsedPrice());
+                currentBook.setAzNewPrice(amazon.getLowestNewPrice());
+                currentBook.addHistoricPriceAz(amazon.getLowestUsedPrice());
+                Thread.sleep((long) 1.1 * 1000);
+                booksQueried += 1;
+                addToUniqueBooks(currentBook);
+                System.out.println(booksQueried);
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+
+            }
+        }
+    }
+
 
     /**
      This function is really part of the load function.  It was placed in its own method for the sake of possible
@@ -317,25 +338,28 @@ public class Departments {
         Course currentCourse=new Course(map.get("courseCode"),currentDept);
         Section currentSection=new Section(map.get("sectionCode"),currentCourse);
         Book currentBook=new Book(map.get("title"),map.get("isbn"),Actions.bookStatus(map.get("bookStatus")),
-                Double.valueOf(map.get("newBookPrice")),Double.valueOf(map.get("usedBookPrice")),currentSection);
-        Iterator mapIterator= map.keySet().iterator();
+                Double.valueOf(map.get("wwuNewPrice")),Double.valueOf(map.get("wwuUsedPrice")),currentSection);
+        Iterator mapIterator= map.entrySet().iterator();
         while (mapIterator.hasNext()){
-            Map.Entry current=(Map.Entry)mapIterator.next();
-            String key= (String)current.getKey();
+            Map.Entry mapEntry=(Map.Entry) mapIterator.next();
+            String key= mapEntry.getKey().toString();
             if (key.contains("azPrice")){
                 key=key.substring(7,key.length());
-                currentBook.addHistoricPriceAz(key,(Double)current.getValue());
+                currentBook.addHistoricPriceAz(key,(Double)mapEntry.getValue());
             }
             else if (key.contains("wwuPrice")){
                 key=key.substring(8,key.length());
-                currentBook.addHistoricPriceWwu(key,(Double)current.getValue());
-                currentBook.setProfitAndROI();
+                currentBook.addHistoricPriceWwu(key,(Double)mapEntry.getValue());
             }
             else if (key.equals("azUsedPrice")){
-                currentBook.setAzNewPrice(Double.valueOf(((String)current.getValue())));
+                currentBook.setAzNewPrice(Double.valueOf(((String)mapEntry.getValue())));
             }
             else if(key.equals("azNewPrice")){
-                currentBook.setAzNewPrice(Double.valueOf((String)current.getValue()));
+                currentBook.setAzNewPrice(Double.valueOf((String)mapEntry.getValue()));
+            }
+
+            if(currentBook.getWwuUsedPrice()>0 && currentBook.getAzUsedPrice()>0){
+                currentBook.setProfitAndROI();//do after all prices have been set
             }
         }
         //if there is an object already created these
@@ -374,15 +398,15 @@ public class Departments {
                         "shared3/textbooks/json/json_depts.html&term="+term+"&deptSort=ACDEPT_NAME&store=444");
                 String jsonSTR=Actions.getTXTFromURL(url);
                 JSONObject jsonObject = new JSONObject(jsonSTR);
-                Actions.save(jsonSTR,"departmentsSave.txt");
-                JSONArray data=jsonObject.getJSONArray("depts");
-                for(int i=0; i<data.length();i++){
-                    jsonObject=data.getJSONObject(i);
-                    String code=jsonObject.getString("code");
+                Actions.parseJSON(jsonObject,"depts",list);
+                for(int listIndex=0; listIndex<list.size();listIndex++){
+                    String code=list.get(listIndex).get("code");
+                    String deptName=list.get(listIndex).get("name");
                     if (!code.toLowerCase().equals("zlast")) {
-                        addDepartment(new Department(Actions.fillSpace(code), jsonObject.getString("name")));
+                        addDepartment(new Department(Actions.fillSpace(code), deptName));
                     }
                 }
+                list.clear();//readies the list for the next round
                 return true;
             } catch (MalformedURLException e) {
                 return false;
@@ -413,15 +437,21 @@ public class Departments {
                 url = new URL("https://secure3.sequoiars.com/ePOS?form=shared3/" +
                         "textbooks/json/json_courses.html&term=" + term + "&department=" + departmentCode + "&store=444");
                 String jsonSTR=Actions.getTXTFromURL(url);
-                JSONObject jsonObject = new JSONObject(jsonSTR);
-                Actions.save(jsonSTR,departmentCode+"courseSave.txt");
-                JSONArray data=jsonObject.getJSONArray("courses");
-                for(int course=0; course<data.length();course++){
-                    jsonObject=data.getJSONObject(course);
-                    String code=jsonObject.getString("code");
-                    if (!code.toLowerCase().equals("zlast")) {
-                        current.addCourse(new Course(code,current));
+                int count=0;
+                while(jsonSTR==null && count<4){
+                    jsonSTR=Actions.getTXTFromURL(url);
+                    count++;
+                }
+                if (jsonSTR!=null) {
+                    JSONObject jsonObject = new JSONObject(jsonSTR);
+                    Actions.parseJSON(jsonObject, "courses", list);
+                    for (int course = 0; course < list.size(); course++) {
+                        String code = list.get(course).get("code");
+                        if (!code.toLowerCase().equals("zlast")) {
+                            current.addCourse(new Course(code, current));
+                        }
                     }
+                    list.clear();
                 }
             } catch (MalformedURLException e) {
                 System.out.println("Malformed URl");
@@ -460,15 +490,23 @@ public class Departments {
                     url = new URL("https://secure3.sequoiars.com/ePOS?form=shared3/textbooks/json/json_sections." +
                             "html&term=" + term + "&department=" + currentDeptCode + "&course=" + currentCourseCode + "&store=444");
                     String jsonSTR=Actions.getTXTFromURL(url);
-                    JSONObject jsonObject = new JSONObject(jsonSTR);
-                    Actions.save(jsonSTR,currentDeptCode+currentCourseCode+"sectionsSave.txt");
-                    JSONArray data=jsonObject.getJSONArray("sections");
-                    for(int section=0; section<data.length();section++){
-                        jsonObject=data.getJSONObject(section);
-                        String code=jsonObject.getString("code");
-                        if (!code.toLowerCase().equals("zlast")) {
-                            currentCourse.addSection(new Section(code, jsonObject.getString("instructor"),currentCourse));
+                    int count=0;
+                    while(jsonSTR==null && count<4){
+                        jsonSTR=Actions.getTXTFromURL(url);
+                        count++;
+                    }
+                    if (jsonSTR!=null) {
+                        JSONObject jsonObject = new JSONObject(jsonSTR);
+                        Actions.parseJSON(jsonObject, "sections", list);
+                        for (int section = 0; section < list.size(); section++) {
+                            Map<String, String> map = list.get(section);
+                            String code = map.get("code");
+                            if (!code.toLowerCase().equals("zlast")) {
+                                String instructor = map.get("instructor");
+                                currentCourse.addSection(new Section(code, instructor, currentCourse));
+                            }
                         }
+                        list.clear();
                     }
                 } catch (MalformedURLException e) {
                     return false;
@@ -513,41 +551,46 @@ public class Departments {
                                     "term=" + term + "&dept=" + deptCode + "&crs=" + currentCourseCode + "&sec=" + currentSectionCode +
                                     "&store=444&dti=YES&desc=&bSug=YES&cSug=&H=N");
                             String jsonSTR=Actions.getTXTFromURL(url);
-                            JSONObject jsonObject = new JSONObject(jsonSTR);
-                            Actions.parseJSON(jsonObject,"books",list);
-                            //finding title
-                            for (int listIndex=0;listIndex<list.size();listIndex++){
-                                if (list.get(listIndex).containsKey("title")){
-                                    title=list.get(listIndex).get("title");
-                                }
+                            int count=0;
+                            while(jsonSTR==null && count<4){
+                                jsonSTR=Actions.getTXTFromURL(url);
+                                count++;
                             }
-                                if(!title.toLowerCase().equals("no books found")) {
-                                    for (int listIndex=0;listIndex<list.size();listIndex++){
+                            if (jsonSTR!=null) {
+                                JSONObject jsonObject = new JSONObject(jsonSTR);
+                                Actions.parseJSON(jsonObject, "books", list);
+                                //finding title
+                                for (int listIndex = 0; listIndex < list.size(); listIndex++) {
+                                    if (list.get(listIndex).containsKey("title")) {
+                                        title = list.get(listIndex).get("title");
+                                    }
+                                }
+                                if (!title.toLowerCase().equals("no books found")) {
+                                    for (int listIndex = 0; listIndex < list.size(); listIndex++) {
                                         //data that is the same for new and used books
-                                        if (list.get(listIndex).containsKey("title")){
-                                            sku=list.get(listIndex).get("sku");
+                                        if (list.get(listIndex).containsKey("title")) {
+                                            sku = list.get(listIndex).get("sku");
+                                            bookStatus = list.get(listIndex).get("bookstatus");
                                         }
                                         //data applicable to used books only
-                                        if (list.get(listIndex).get("isUsed")=="1"){
-                                            usedBookPrice=list.get(listIndex).get("salePrice");
-
+                                        if (list.get(listIndex).containsKey("isUsed") && list.get(listIndex).get("isUsed").equals("1")) {
+                                            usedBookPrice = list.get(listIndex).get("salePrice");
                                         }
                                         //data applicable to new books only
-                                        if (list.get(listIndex).get("isNew")=="1"){
-                                            newBookPrice=list.get(listIndex).get("salePrice");
+                                        if (list.get(listIndex).containsKey("isNew") && list.get(listIndex).get("isNew").equals("1")) {
+                                            newBookPrice = list.get(listIndex).get("salePrice");
                                         }
                                     }
-                                    //Data points collected are bookStatus,sku,title,newBookPrice,usedBookPrice,
-                                    //
-                                    Book currentBook= new Book(title, sku, Actions.bookStatus(bookStatus),
-                                            Double.valueOf(newBookPrice), Double.valueOf(usedBookPrice),currentSection);
+                                    Book currentBook = new Book(title, sku, Actions.bookStatus(bookStatus),
+                                            Double.valueOf(newBookPrice), Double.valueOf(usedBookPrice), currentSection);
                                     currentSection.addBook(currentBook);
                                     currentBook.addHistoricPriceWwu(Double.valueOf(usedBookPrice));
                                     // start of the save process
                                     save(currentBook);
                                     //end of the save process
+                                    list.clear();//ready list for next use
                                 }
-
+                            }
                         }
                     }
                 }

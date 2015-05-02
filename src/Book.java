@@ -20,11 +20,11 @@ public class Book implements Comparator{
     private double ROI;
     private String currentDate;
 
-    public Book(String title,String isbn, boolean isMandatory,double newPrice, double usedPrice,Section parent) {
+    public Book(String title,String isbn, boolean isMandatory,double wwuNewPrice, double wwuUsedPrice,Section parent) {
         this.isbn = isbn;
         this.isMandatory = isMandatory;
-        this.wwuUsedPrice = usedPrice;
-        this.wwuNewPrice = newPrice;
+        this.wwuUsedPrice = wwuUsedPrice;
+        this.wwuNewPrice = wwuNewPrice;
         this.title = title;
         this.parent = parent;
         this.historicPricesAz = new TreeMap<String, Double>();
@@ -53,6 +53,15 @@ public class Book implements Comparator{
     }
 
     public double getAzNewPrice(){return azNewPrice;}
+
+    public double getLowestAZPrice(){
+        List<Double> prices= new ArrayList<Double>();
+        prices.add(getAzUsedPrice());
+        prices.add(getAzNewPrice());
+        prices.add(getWwuNewPrice());
+        prices.add(getWwuUsedPrice());
+        return Actions.lowestNumber(prices);
+    }
 
     public double getROI(){return ROI;}
 
