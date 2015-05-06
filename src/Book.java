@@ -54,6 +54,10 @@ public class Book implements Comparator{
 
     public double getAzNewPrice(){return azNewPrice;}
 
+    /**
+     * returns the lowest price of the recorded prices.  Uses Actions.lowestNumber() to do this.
+     * @return
+     */
     public double getLowestAZPrice(){
         List<Double> prices= new ArrayList<Double>();
         prices.add(getAzUsedPrice());
@@ -69,12 +73,12 @@ public class Book implements Comparator{
 
     public Map<String,Double> getHistoricPricesWwu(){return historicPricesWwu;}
 
-    public void setAzUsedPrice(double price){
-        azUsedPrice=price;
+    public void setAzUsedPrice(double azUsedPrice){
+        this.azUsedPrice=azUsedPrice;
     }
 
-    public void setAzNewPrice(double price){
-        azNewPrice=price;
+    public void setAzNewPrice(double azNewPrice){
+        this.azNewPrice=azNewPrice;
     }
 
     public void setTitle(String title){
@@ -118,6 +122,11 @@ public class Book implements Comparator{
         }
     }
 
+    /**
+     * Evaluates equality of two book objects entirely bases on the isbn value.
+     * @param object
+     * @return true if the isbn matches false otherwise
+     */
     @Override
     public boolean equals(Object object){
         if(object instanceof Book){

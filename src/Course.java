@@ -20,6 +20,10 @@ public class Course {
         return parent;
     }
 
+    public int sectionCount(){
+        return sections.size();
+    }
+
     public boolean addSection(Section value){
         if (value==null || sections.containsKey(value.getSectionCode())) return false;
         sections.put(value.getSectionCode(), value);

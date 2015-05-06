@@ -66,6 +66,8 @@ public class Amazon{
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
 

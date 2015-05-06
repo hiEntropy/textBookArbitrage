@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -7,26 +8,34 @@ import java.util.Map;
 public class Department {
     private String departmentCode, departmentName;
     private Map<String,Course> courseCodes;
-    private int courseCount;
     public Department(String departmentCode, String departmentName){
         this.departmentCode = departmentCode;
         this.departmentName = departmentName;
         courseCodes=new HashMap<String,Course>();
-        courseCount=0;
     }
 
     public boolean addCourse(Course value){
         if (value==null || courseCodes.containsKey(value)) return false;
         courseCodes.put(value.getCourseCode(),value);
-        courseCount+=1;
         return true;
-
     }
     public String getDepartmentCode(){
         if(departmentCode !=null){
             return departmentCode;
         }
         return null;
+    }
+
+    public int size(){
+        int size=0;
+        Iterator iterator= courseCodes.entrySet().iterator();
+        while(iterator.hasNext()){
+            Map.Entry current=(Map.Entry)iterator.next();
+            String key=(String)current.getKey();
+            Course course=courseCodes.get(key);
+            size+=course.sectionCount();
+        }
+        return size+getCourseCount();
     }
 
     public Map<String,Course> getCourseCodes(){
@@ -38,7 +47,7 @@ public class Department {
     }
 
     public int getCourseCount(){
-        if (courseCodes!=null) return courseCount;
+        if (courseCodes!=null) return courseCodes.size();
         return -1;
     }
 

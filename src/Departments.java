@@ -1,13 +1,25 @@
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
 /**
- Needed Improvements:
- *See individual method note for improvements.
+ Departments is a class that directs data collection, storage and some reporting functions.  This class is the top
+ of the organization chart for modeling the structure at WWU.
+ The structure is Departments--->Department---->Course--->Section--->Book
+ Every Department object has a map of Course Objects, every Course Object has a map of Section Objects, every Section Object
+ has a map of Book Objects.
+
+ Departments Class contains the functions that are responsible for data collection because it is the head of the
+ organization chart allowing it easy top down access to every level of data.
+
+ Some reporting tasks are here also because this is were the data "lives."  Although a reference could be passed to
+ another class like the Reports class to handle reporting just as easily.  This is a structural decision that is
+ under contemplation
  **/
 public class Departments {
     //master storage for all departments
@@ -41,6 +53,33 @@ public class Departments {
         }
     }
 
+
+    public Map<String,Department> getDepartments(){
+        return departments;
+    }
+
+    /**
+     * makes uniqueBooks Array available to other methods
+     * @return ArrayList of Book Objects
+     */
+    public ArrayList<Book> getUniqueBooks(){
+        return uniqueBooks;
+    }
+
+    /**
+     *
+     * @return formatted term code for example s15 for spring of 2015.  This is used in the URL to WWU Bookstore
+     */
+    public String getTerm(){
+        return term;
+    }
+
+    /**
+     * orders all books in the uniqueBooks ArrayList by cost difference relative to Amazon.  If the wwuBookstore charges
+     * less for the book the difference will be positive books that are cheapest on amazon will be at the top of the
+     * queue
+     * @return MaxPriorityQueue<Book>
+     */
     public PriorityQueue<Book> getPriorityQueueByCostDifference(){
         if (uniqueBooks.size()>0) {
             Comparator<Book> comparator1 = new Comparator<Book>() {
@@ -69,6 +108,11 @@ public class Departments {
         return null;
     }
 
+    /**
+     * Orders Book objects from greatest to least based on Return on investment if bought on amazon and sold to the
+     * wwu Bookstore at the maximum payoff minus shipping of 3.99
+     * @return PriorityQueue
+     */
     public PriorityQueue<Book> getPriorityQueueByROI(){
         if (uniqueBooks.size()>0){
             Comparator<Book> comparator=new Comparator<Book>() {
@@ -89,86 +133,6 @@ public class Departments {
         return null;
     }
 
-    public boolean reportPriceDifferences(){
-        PriorityQueue<Book> books=getPriorityQueueByCostDifference();
-        String fileName=Actions.fileNameAssignment("price_differences_report_"+term,".txt");
-        double amazonCheaper=0;
-        double wwuCheaper=0;
-        double amazonNoOffer=0;//This is the amount of times the WWU has the book used but amazon does not
-        double wwuNoOffer=0;//This is the amount of times wwu does not offer a used book but Amazon does
-        if (books!=null){
-            String saveString= String.format("%-15s %-15s %-15s %-15s","ISBN","WWU Price","Amazon Price", "Difference")+"\n";
-            String formattedData="";
-            while(books.peek()!=null){
-                Book current=books.poll();
-                if (current.getAzUsedPrice()==-1 && current.getWwuUsedPrice()>0){
-                    amazonNoOffer+=1;
-                }
-                else if (current.getAzUsedPrice()>0 && current.getWwuUsedPrice()==0){
-                    wwuNoOffer+=1;
-                }
-                else if(current.getAzUsedPrice()!=-1 && current.getWwuUsedPrice()!=0) {
-                    if(current.getAzUsedPrice()>current.getWwuUsedPrice()){
-                        wwuCheaper+=1.0;
-                    }
-                    else{
-                        amazonCheaper+=1.0;
-                    }
-                    formattedData = String.format("%-15s %-15.2f %-15.2f %-15.2f", current.getIsbn(), current.getWwuUsedPrice(),
-                            current.getAzUsedPrice(), current.getWwuUsedPrice() - current.getAzUsedPrice()) + "\n";
-                    saveString += formattedData;
-                }
-            }
-            double percentAmazonCheaper=(amazonCheaper / (amazonCheaper + wwuCheaper))*100;
-            double percentWwuCheaper=(wwuCheaper/(amazonCheaper+wwuCheaper))*100.00;
-            double amazonNoOfferPercent=((amazonNoOffer)/(amazonCheaper+wwuCheaper))*100.00;
-            double wwuNoOfferPercent=((wwuNoOffer)/(amazonCheaper+wwuCheaper))*100.00;
-            saveString+="\n"+String.format("%-25s %-35s ","Times WWU is Cheaper","Times AZ is Cheaper")+"\n"+"\n";
-            saveString+=String.format("%-25.0f %-35.0f",wwuCheaper,amazonCheaper)+"\n";
-            saveString+=String.format("%-25s %-35s","Percent WWU is Cheaper","Percent AZ is Cheaper")+"\n\n";
-            saveString+=String.format("%-25.2f %-35.2f",percentWwuCheaper,percentAmazonCheaper)+"\n\n";
-            saveString+=String.format("%-25s %-35s","Amazon No Offer","WWU No Offer")+"\n\n";
-            saveString+=String.format("%-25.2f %-35.2f",amazonNoOffer,wwuNoOffer)+"\n\n";
-            saveString+=String.format("%-25s %-35s","Percent AZ No Offer","Percent WWU No Offer")+"\n\n";
-            saveString+=String.format("%-25.2f %-35.2f",amazonNoOfferPercent,wwuNoOfferPercent)+"\n\n";
-            if (Actions.save(saveString,fileName)) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    public boolean reportROIRanks(){
-        PriorityQueue<Book> books=getPriorityQueueByROI();
-        String fileName=Actions.fileNameAssignment("ROIRankReport_"+term,".txt");
-        if (books!=null) {
-            String saveString =
-                    String.format("%-15s %-15s %-15s %-14s %-14s %-14s %-15s","Dept","Course", "ISBN", "Amazon", "WWU", "Profit", "ROI");
-            String formattedData = "";
-            while (books.peek() != null) {
-                Book current = books.poll();
-                String isbn = current.getIsbn();
-                String dept= current.getParent().getParent().getParent().getDepartmentCode();
-                String course=current.getParent().getParent().getCourseCode();
-                double azUsedPrice = current.getAzUsedPrice();
-                double wwuUsedPrice = current.getWwuUsedPrice();
-                double profit = current.getProfit();
-                double ROI = current.getROI() * 100;
-                formattedData = "\n\n" + String.format("%-15s %-15s %-15s$%-14.2f $%-14.2f $%-14.2f %-13.2f",dept, course,
-                        isbn, azUsedPrice, wwuUsedPrice, profit, ROI) + "\n";
-                saveString += formattedData;
-            }
-            if (Actions.save(saveString, fileName)) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return false;
-    }
-
     public int getBookCount(){
         return bookCount;
     }
@@ -186,11 +150,15 @@ public class Departments {
         System.out.println("Sections Loaded "+sectionsStatus);
         boolean booksStatus= populatedBooksFromWWU();
         System.out.println("Books Loaded "+booksStatus);
-        boolean saveStatus=Actions.save(holder.toString(),"booksSaved.txt");
+        boolean saveStatus=Actions.save(holder.toString(),"S15.txt");
         System.out.println("Content Saved "+saveStatus);
-
     }
 
+    /**
+     * Adds a new department to the map of Department Objects called departments
+     * @param value Deptartment object
+     * @return true if successfully added false otherwise
+     */
     public boolean addDepartment(Department value){
         if(value==null)return false;
         if(departments.containsKey(value))return false;
@@ -240,7 +208,7 @@ public class Departments {
      The getAmazonPrices() function cycles through all books and contacts the amazon product api in order to get the
      lowest used and new price for each book.  Currently this function ignores repeat requests for the same isbn which
      will be corrected.  The requests are only allowed once every second and the function limits the requests further by
-     limiting sleeping program execution for 2*1000 milliseconds 2 seconds.  This method limits requests are limited further to
+     limiting sleeping program execution for 1.1*1000 milliseconds 1.1 seconds.  This method limits requests are limited further to
      avoid HTTP 503 errors being generated by the Amazon server.  The unfortunate part of this increased reliability
      is that the maximum request per hour
      falls to 1800 per hour instead of the full 3600 which makes the full execution of this part of the algorithm approximately
@@ -277,53 +245,66 @@ public class Departments {
                             if (!uniqueBooks.contains(currentBook)) {
                                 try {
                                     Amazon amazon = new
-                                            Amazon(currentBook.getIsbn(), "4Fa2FNqU0gLHOdESbVJsVgnLuCCvnKiKP5tjdAUZ", "AKIAIL5UKVGTZINL2N3Q");
+                                            Amazon(currentBook.getIsbn(), "apiKey", "awsKey");
                                     amazon.queryAmazon();
                                     currentBook.setAzUsedPrice(amazon.getLowestUsedPrice());
                                     currentBook.addHistoricPriceAz(amazon.getLowestUsedPrice());
                                     currentBook.setAzNewPrice(amazon.getLowestNewPrice());
+                                    currentBook.setProfitAndROI();
                                     Thread.sleep((long)1.1*1000);
                                     booksQueried+=1;
                                     addToUniqueBooks(currentBook);
+                                    save(currentBook);
                                     System.out.println(booksQueried);
 
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
-
+                                }catch (Exception e){
+                                    e.printStackTrace();
                                 }
                             }
-                            save(currentBook);
+                            System.out.println(booksQueried+" books queried");
                         }
                     }
                 }
             }
-            boolean saveStatus=Actions.save(holder.toString(),"booksSaved.txt");
-            System.out.println("Content Saved "+saveStatus);
+            boolean saveStatus=Actions.save(holder.toString(),term+".txt");
+            System.out.println(booksQueried+" books queried");
         }
     }
 
+    /**
+     * This does the same thing as getAmazonPrices() except it relies on the uniqueBooks ArrayList being filled with
+     * the necessary Book objects while the getAmazonPrices() method relies on the map of Department Objects called
+     * departments
+     */
     public void getAmazonPricesFromLoad(){
+        if (uniqueBooks==null)return;
         for (int book=0;book<uniqueBooks.size();book++) {
             Book currentBook=uniqueBooks.get(book);
             try {
                 Amazon amazon = new
-                        Amazon(currentBook.getIsbn(), "4Fa2FNqU0gLHOdESbVJsVgnLuCCvnKiKP5tjdAUZ", "AKIAIL5UKVGTZINL2N3Q");
+                        Amazon(currentBook.getIsbn(), "apiKey", "awsKey");
                 amazon.queryAmazon();
                 currentBook.setAzUsedPrice(amazon.getLowestUsedPrice());
                 currentBook.setAzNewPrice(amazon.getLowestNewPrice());
                 currentBook.addHistoricPriceAz(amazon.getLowestUsedPrice());
+                currentBook.setProfitAndROI();
                 Thread.sleep((long) 1.1 * 1000);
                 booksQueried += 1;
                 addToUniqueBooks(currentBook);
+                save(currentBook);
                 System.out.println(booksQueried);
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
-
+            }catch (Exception e){
+                e.printStackTrace();
             }
         }
+        System.out.println(booksQueried+" books queried");
+        boolean saveStatus=Actions.save(holder.toString(),term+".txt");
     }
-
 
     /**
      This function is really part of the load function.  It was placed in its own method for the sake of possible
@@ -345,22 +326,19 @@ public class Departments {
             String key= mapEntry.getKey().toString();
             if (key.contains("azPrice")){
                 key=key.substring(7,key.length());
-                currentBook.addHistoricPriceAz(key,(Double)mapEntry.getValue());
+                currentBook.addHistoricPriceAz(key,Double.valueOf((String)mapEntry.getValue()));
             }
             else if (key.contains("wwuPrice")){
                 key=key.substring(8,key.length());
-                currentBook.addHistoricPriceWwu(key,(Double)mapEntry.getValue());
+                currentBook.addHistoricPriceWwu(key,Double.valueOf((String)mapEntry.getValue()));
             }
             else if (key.equals("azUsedPrice")){
-                currentBook.setAzNewPrice(Double.valueOf(((String)mapEntry.getValue())));
+                currentBook.setAzUsedPrice(Double.valueOf((String)mapEntry.getValue()));
             }
             else if(key.equals("azNewPrice")){
                 currentBook.setAzNewPrice(Double.valueOf((String)mapEntry.getValue()));
             }
 
-            if(currentBook.getWwuUsedPrice()>0 && currentBook.getAzUsedPrice()>0){
-                currentBook.setProfitAndROI();//do after all prices have been set
-            }
         }
         //if there is an object already created these
         // if statements will replace the new one with the old one.
@@ -382,6 +360,7 @@ public class Departments {
         }
         if (!currentSection.getBooks().containsValue(currentBook)){currentSection.addBook(currentBook);}
         addToUniqueBooks(currentBook);
+        currentBook.setProfitAndROI();
     }
 
     /**
@@ -584,10 +563,8 @@ public class Departments {
                                     Book currentBook = new Book(title, sku, Actions.bookStatus(bookStatus),
                                             Double.valueOf(newBookPrice), Double.valueOf(usedBookPrice), currentSection);
                                     currentSection.addBook(currentBook);
+                                    addToUniqueBooks(currentBook);
                                     currentBook.addHistoricPriceWwu(Double.valueOf(usedBookPrice));
-                                    // start of the save process
-                                    save(currentBook);
-                                    //end of the save process
                                     list.clear();//ready list for next use
                                 }
                             }
@@ -603,8 +580,6 @@ public class Departments {
         }
         return true;
     }
-
-
 
     /**
      * This is used in the instantiate() and getAmazonPrices().  The objective of the uniqueBooks ArrayList<Book> is to

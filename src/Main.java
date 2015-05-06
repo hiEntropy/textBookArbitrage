@@ -1,8 +1,3 @@
-import com.sun.org.apache.xpath.internal.SourceTree;
-
-/**
- * Created by Austin on 3/21/2015.
- */
 
 public class Main {
     public static void main(String[] args) {
@@ -16,9 +11,10 @@ public class Main {
                 String year=Actions.getUserInput();
                 String fileName=Actions.formatTermYear(term,year)+".txt";
                 Departments departments1=new Departments(term,year);
+                Reports report=new Reports(departments1);
                 departments1.load(fileName);
-                departments1.reportROIRanks();
-                departments1.reportPriceDifferences();
+                report.reportROIRanks();
+                report.reportPriceDifferences();
                 System.out.println("Data for "+term+" "+year+" successfully loaded.");
             }
             if (userInput.equals("2")){
@@ -26,13 +22,13 @@ public class Main {
                 String term=Actions.getUserInput();
                 System.out.println("Select Year");
                 String year=Actions.getUserInput();
-                String designator=Actions.formatTermYear(term,year)+".txt";
                 Departments departments= new Departments(term,year);
+                Reports report = new Reports(departments);
                 System.out.println("Beginning... You may want to go do something else while I work");
                 departments.requestDataFromWWU();
                 departments.getAmazonPrices();
-                departments.reportROIRanks();
-                departments.reportPriceDifferences();
+                report.reportROIRanks();
+                report.reportPriceDifferences();
             }
 
             if (userInput.equals("3")){
@@ -42,12 +38,13 @@ public class Main {
                 System.out.println("Select Year");
                 String year=Actions.getUserInput();
                 Departments departments= new Departments(term,year);
+                Reports report = new Reports(departments);
                 departments.load(Actions.formatTermYear(term,year)+".txt");
                 System.out.println("Getting prices from Amazon");
                 departments.getAmazonPricesFromLoad();
                 System.out.println("Generating Reports");
-                departments.reportROIRanks();
-                departments.reportPriceDifferences();
+                report.reportROIRanks();
+                report.reportPriceDifferences();
                 long endTime=System.nanoTime();
                 System.out.println("Completed in "+String.valueOf((endTime-startTime)/60000000000.00)+" minutes");//converts to minutes
             }
