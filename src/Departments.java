@@ -581,6 +581,28 @@ public class Departments {
         return true;
     }
 
+    public List<Book> getBooksByDepartment(Department department){
+        List<Book> listBooks= new ArrayList<Book>();
+        Map<String,Course> courses=department.getCourseCodes();
+        Iterator courseIterator= courses.entrySet().iterator();
+        while(courseIterator.hasNext()){
+            Map.Entry courseEntry=(Map.Entry)courseIterator.next();
+            Map<String,Section> sections=courses.get(courseEntry.getKey()).getSections();
+            Iterator sectionsIterator=sections.entrySet().iterator();
+            while(sectionsIterator.hasNext()){
+                Map.Entry sectionEntry= (Map.Entry)sectionsIterator.next();
+                Map<String,Book> books= sections.get(sectionEntry.getKey()).getBooks();
+                Iterator booksIterator=books.entrySet().iterator();
+                while(booksIterator.hasNext()){
+                    Map.Entry bookEntry=(Map.Entry)booksIterator.next();
+                    Book current=books.get(bookEntry.getKey());
+                    listBooks.add(current);
+                }
+            }
+        }
+        return listBooks;
+    }
+
     /**
      * This is used in the instantiate() and getAmazonPrices().  The objective of the uniqueBooks ArrayList<Book> is to
      * create a list of prices so that the program can make fast ROI calculations.
