@@ -2,15 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9374d6e8-a4cb-40ee-9146-06c7363654d2" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/textBookArbitrage2/Book.class" afterPath="$PROJECT_DIR$/out/production/textBookArbitrage2/Book.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/textBookArbitrage2/Course.class" afterPath="$PROJECT_DIR$/out/production/textBookArbitrage2/Course.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/textBookArbitrage2/Department.class" afterPath="$PROJECT_DIR$/out/production/textBookArbitrage2/Department.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/textBookArbitrage2/Departments$1.class" afterPath="$PROJECT_DIR$/out/production/textBookArbitrage2/Departments$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/textBookArbitrage2/Departments$2.class" afterPath="$PROJECT_DIR$/out/production/textBookArbitrage2/Departments$2.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/textBookArbitrage2/Departments.class" afterPath="$PROJECT_DIR$/out/production/textBookArbitrage2/Departments.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/textBookArbitrage2/Main.class" afterPath="$PROJECT_DIR$/out/production/textBookArbitrage2/Main.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Departments.java" afterPath="$PROJECT_DIR$/src/Departments.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Main.java" afterPath="$PROJECT_DIR$/src/Main.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="textBookArbitrage2.iws" />
@@ -84,9 +75,21 @@
       <file leaf-file-name="Departments.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Departments.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="25.978552" vertical-offset="0" max-vertical-offset="10268">
-              <caret line="598" column="43" selection-start-line="598" selection-start-column="43" selection-end-line="598" selection-end-column="43" />
+            <state vertical-scroll-proportion="0.5483871" vertical-offset="340" max-vertical-offset="10506">
+              <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
               <folding>
+                <element signature="e#2161#2162#0" expanded="true" />
+                <element signature="e#2195#2196#0" expanded="true" />
+                <element signature="e#2356#2357#0" expanded="true" />
+                <element signature="e#2390#2391#0" expanded="true" />
+                <element signature="e#2556#2557#0" expanded="true" />
+                <element signature="e#2583#2584#0" expanded="true" />
+                <element signature="e#3037#3783#0" expanded="true" />
+                <element signature="e#3782#3783#0" expanded="true" />
+                <element signature="e#4334#4806#0" expanded="true" />
+                <element signature="e#4805#4806#0" expanded="true" />
+                <element signature="e#5026#5027#0" expanded="true" />
+                <element signature="e#5058#5059#0" expanded="true" />
                 <element signature="docComment;method#load#0;class#Departments#0" expanded="false" />
                 <element signature="e#28771#28777#0" expanded="true" />
               </folding>
@@ -161,11 +164,11 @@
         <option value="$PROJECT_DIR$/src/Book.java" />
         <option value="$PROJECT_DIR$/src/Course.java" />
         <option value="$PROJECT_DIR$/src/Department.java" />
-        <option value="$PROJECT_DIR$/src/Departments.java" />
         <option value="$PROJECT_DIR$/src/Reports.java" />
         <option value="$PROJECT_DIR$/src/Statistics.java" />
         <option value="$PROJECT_DIR$/Tests/StatisticsTest.java" />
         <option value="$PROJECT_DIR$/src/Main.java" />
+        <option value="$PROJECT_DIR$/src/Departments.java" />
       </list>
     </option>
   </component>
@@ -702,7 +705,7 @@
       <workItem from="1430847676161" duration="55000" />
       <workItem from="1430859171017" duration="4836000" />
       <workItem from="1431121756310" duration="249000" />
-      <workItem from="1431126165810" duration="40545000" />
+      <workItem from="1431126165810" duration="40841000" />
     </task>
     <task id="LOCAL-00001" summary="Adding tests and some changes to Actions class">
       <created>1427614201106</created>
@@ -734,11 +737,23 @@
       <option name="project" value="LOCAL" />
       <updated>1430886699491</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Adding tests and some changes to Actions class">
+      <created>1431312993631</created>
+      <option name="number" value="00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1431312993631</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Merge remote-tracking branch 'origin/master'&#10;&#10;Conflicts:&#10;&#9;src/Departments.java&#10;">
+      <created>1431313246909</created>
+      <option name="number" value="00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1431313246909</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="251063000" />
+    <option name="totallyTimeSpent" value="251359000" />
   </component>
   <component name="TodoView" selected-index="0">
     <todo-panel id="selected-file">
@@ -762,9 +777,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="0" width="1375" height="728" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32885906" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32885906" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32885906" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32718122" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
@@ -775,7 +790,7 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32927758" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32718122" sideWeight="0.49961978" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32718122" sideWeight="0.49961978" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32843137" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19847909" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -809,7 +824,8 @@
       <TodoPanelSettings />
     </option>
     <MESSAGE value="Adding tests and some changes to Actions class" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding tests and some changes to Actions class" />
+    <MESSAGE value="Merge remote-tracking branch 'origin/master'&#10;&#10;Conflicts:&#10;&#9;src/Departments.java&#10;" />
+    <option name="LAST_COMMIT_MESSAGE" value="Merge remote-tracking branch 'origin/master'&#10;&#10;Conflicts:&#10;&#9;src/Departments.java&#10;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -861,8 +877,8 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="10642">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#2161#2162#0" expanded="false" />
-            <element signature="e#2195#2196#0" expanded="false" />
+            <element signature="e#2161#2162#0" expanded="true" />
+            <element signature="e#2195#2196#0" expanded="true" />
             <element signature="docComment;method#load#0;class#Departments#0" expanded="false" />
           </folding>
         </state>
@@ -888,8 +904,8 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="4658" max-vertical-offset="9316">
           <caret line="276" column="0" selection-start-line="276" selection-start-column="0" selection-end-line="276" selection-end-column="0" />
           <folding>
-            <element signature="e#2161#2162#0" expanded="false" />
-            <element signature="e#2195#2196#0" expanded="false" />
+            <element signature="e#2161#2162#0" expanded="true" />
+            <element signature="e#2195#2196#0" expanded="true" />
             <element signature="docComment;method#load#0;class#Departments#0" expanded="false" />
           </folding>
         </state>
@@ -969,8 +985,8 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="8779" max-vertical-offset="9350">
           <caret line="527" column="7" selection-start-line="527" selection-start-column="7" selection-end-line="527" selection-end-column="7" />
           <folding>
-            <element signature="e#2161#2162#0" expanded="false" />
-            <element signature="e#2195#2196#0" expanded="false" />
+            <element signature="e#2161#2162#0" expanded="true" />
+            <element signature="e#2195#2196#0" expanded="true" />
             <element signature="docComment;method#load#0;class#Departments#0" expanded="false" />
           </folding>
         </state>
@@ -1260,9 +1276,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Departments.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="25.978552" vertical-offset="0" max-vertical-offset="10268">
-          <caret line="598" column="43" selection-start-line="598" selection-start-column="43" selection-end-line="598" selection-end-column="43" />
+        <state vertical-scroll-proportion="0.5483871" vertical-offset="340" max-vertical-offset="10506">
+          <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
           <folding>
+            <element signature="e#2161#2162#0" expanded="true" />
+            <element signature="e#2195#2196#0" expanded="true" />
+            <element signature="e#2356#2357#0" expanded="true" />
+            <element signature="e#2390#2391#0" expanded="true" />
+            <element signature="e#2556#2557#0" expanded="true" />
+            <element signature="e#2583#2584#0" expanded="true" />
+            <element signature="e#3037#3783#0" expanded="true" />
+            <element signature="e#3782#3783#0" expanded="true" />
+            <element signature="e#4334#4806#0" expanded="true" />
+            <element signature="e#4805#4806#0" expanded="true" />
+            <element signature="e#5026#5027#0" expanded="true" />
+            <element signature="e#5058#5059#0" expanded="true" />
             <element signature="docComment;method#load#0;class#Departments#0" expanded="false" />
             <element signature="e#28771#28777#0" expanded="true" />
           </folding>
