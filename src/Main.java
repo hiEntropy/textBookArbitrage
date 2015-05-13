@@ -17,7 +17,7 @@ public class Main {
                 Reports report=new Reports(departments);
                 departments.load(fileName);
                 report.reportROIRanks();
-                report.reportPriceDifferences();
+                report.reportROISellingOnAz();
                 report.reportDepartmentBoxAndWhisker();
                 System.out.println("Data for "+term+" "+year+" successfully loaded.");
             }
@@ -32,7 +32,7 @@ public class Main {
                 departments.requestDataFromWWU();
                 departments.getAmazonPrices();
                 report.reportROIRanks();
-                report.reportPriceDifferences();
+                report.reportROISellingOnAz();
             }
 
             if (userInput.equals("3")){
@@ -48,7 +48,7 @@ public class Main {
                 departments.getAmazonPricesFromLoad();
                 System.out.println("Generating Reports");
                 report.reportROIRanks();
-                report.reportPriceDifferences();
+                report.reportROISellingOnAz();
                 long endTime=System.nanoTime();
                 System.out.println("Completed in "+String.valueOf((endTime-startTime)/60000000000.00)+" minutes");//converts to minutes
             }

@@ -55,16 +55,31 @@ public class Book implements Comparator{
     public double getAzNewPrice(){return azNewPrice;}
 
     /**
-     * returns the lowest price of the recorded prices.  Uses Actions.lowestNumber() to do this.
-     * @return
+     *
+     * @return -1 if both prices are below zero else it returns the lowest price that is greater than zero
      */
     public double getLowestAZPrice(){
-        List<Double> prices= new ArrayList<Double>();
-        prices.add(getAzUsedPrice());
-        prices.add(getAzNewPrice());
-        prices.add(getWwuNewPrice());
-        prices.add(getWwuUsedPrice());
-        return Actions.lowestNumber(prices);
+        if (azUsedPrice<0 && azNewPrice<0) return -1;
+        if (azUsedPrice<0 && azNewPrice>0)return azNewPrice;
+        if (azNewPrice<0 && azUsedPrice>0) return azUsedPrice;
+        if (azUsedPrice<azNewPrice)return azUsedPrice;
+        return azNewPrice;
+    }
+
+    public double getLowestWWUPrice(){
+        if (wwuUsedPrice<0 && wwuNewPrice<0) return -1;
+        if (wwuUsedPrice<0 && wwuNewPrice>0)return wwuNewPrice;
+        if (wwuNewPrice<0 && wwuUsedPrice>0) return wwuUsedPrice;
+        if (wwuUsedPrice<wwuNewPrice)return wwuUsedPrice;
+        return wwuNewPrice;
+    }
+
+    public double getLowestPrice(){
+        if (getLowestWWUPrice()<0 && getLowestAZPrice()<0) return -1;
+        if (getLowestAZPrice()<0 && getLowestWWUPrice()>0) return getLowestWWUPrice();
+        if (getLowestAZPrice()>0 && getLowestWWUPrice()<0) return getLowestAZPrice();
+        if (getLowestAZPrice()<getLowestWWUPrice()) return getLowestAZPrice();
+        return getLowestWWUPrice();
     }
 
     public double getROI(){return ROI;}

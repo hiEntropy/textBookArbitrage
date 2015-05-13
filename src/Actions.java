@@ -2,6 +2,7 @@
  * Created by Austin on 3/8/2015.
  */
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -167,7 +168,6 @@ public class Actions {
     }
 
     /**
-     *
      * @param jsonObject as documented at http://www.json.org/javadoc/org/json/JSONObject.html
      * @param container Map<String,String> used to hold the elements of the targeted JSON tag
      * @param list the container parameter is added to this list so that all results can be used by the user
@@ -253,6 +253,45 @@ public class Actions {
         return null;
     }
 
+
+    /**
+     * Needs more testing.
+     * @param list
+     * @return
+     */
+    public static double[] toArray(List list){
+        if (list==null)return null;
+        if (list.get(0) instanceof Double) {
+            double[] rValue = new double[list.size()];
+            for (int i = 0; i < list.size(); i++) {
+                rValue[i] = (Double) list.get(i);
+            }
+            return rValue;
+        }
+        if (list.get(0) instanceof Integer){
+            double[] rValue = new double[list.size()];
+            for (int i = 0; i < list.size(); i++) {
+                rValue[i] = ((Integer)(list.get(i))).doubleValue();
+            }
+            return rValue;
+        }
+        if (list.get(0) instanceof Short){
+            double[] rValue = new double[list.size()];
+            for (int i = 0; i < list.size(); i++) {
+                rValue[i] = ((Short)(list.get(i))).doubleValue();
+            }
+            return rValue;
+        }
+        if (list.get(0) instanceof Float){
+            double[] rValue = new double[list.size()];
+            for (int i = 0; i < list.size(); i++) {
+                rValue[i] = ((Float)(list.get(i))).doubleValue();
+            }
+            return rValue;
+        }
+        return null;
+    }
+
     /**
      * Untested
      * @param nodeList
@@ -320,6 +359,85 @@ public class Actions {
         }catch (TransformerException e){
             e.printStackTrace();
         }
+    }
+
+    /**
+     * calculates ROI as a percentage
+     * @param costs
+     * @param grossProfit
+     * @return
+     */
+    public static double calcROI(double costs,double grossProfit){
+        return 100*(grossProfit-costs)/costs;
+    }
+
+    public static double calcROISellingOnAz(Book book, double mark){
+        double costs=costsSellingSelfFulfilledBook(book);
+        return 100*(setMyAzSalePrice(book,mark)-costs)/costs;
+    }
+
+
+    /**
+     * depends on a non-null book.  it will crash if you send it a null book
+     * @param book
+     * @return
+     */
+    public static double profitFromSelfFulfilledBook(Book book,double mark){
+        double azSalePrice=setMyAzSalePrice(book,mark);
+        double profit=azSalePrice-costsSellingSelfFulfilledBook(book);
+        return profit;
+    }
+
+    /**
+     * It will crash if you send it a null book
+     * @param book
+     * @return
+     */
+    public static double profitFromAzFulfilled(Book book){
+        double azSalePrice=book.getAzUsedPrice()-5.00;//undercut the competition
+        double profit=(azSalePrice)-costsSellingAzFulfilled(book);
+        return profit;
+    }
+
+    /**
+     * mark is how much you want to undercut or over-cut
+     * @param book
+     * @param mark
+     * @return
+     */
+    public static double setMyAzSalePrice(Book book,double mark){
+        if (mark<1) {
+            return book.getLowestAZPrice() * (1 - mark);
+        }
+        if (mark>1){
+            return book.getLowestAZPrice() *(1+mark);
+        }
+        return book.getLowestAZPrice();
+    }
+    /**
+     * It will crash if you send it a null book
+     * @param book
+     * @return
+     */
+    public static double costsSellingSelfFulfilledBook(Book book){
+        double acquisitionCost=book.getLowestWWUPrice();
+        double shippingCost=3.17;//USPS media mail rate
+        double trackingCost=1.05;//USPS tracking costs
+        double envelope=1.89;//USPS cost to buy a bubble wrapped shipping envelope
+        double tax=acquisitionCost*.087;
+        double commission=book.getLowestAZPrice()*.945*.15;
+        double listFee=.99;
+        return acquisitionCost+shippingCost+trackingCost+envelope+tax+commission+listFee;
+    }
+
+    public static double costsSellingAzFulfilled(Book book){
+        double acquisitionCost=book.getWwuUsedPrice();
+        double shipToAZ=3.99;
+        double azCommission=.15;
+        double listFee=.99;
+        double shipToUPurchaser=14.99;
+        double tax=book.getWwuUsedPrice()*.087;
+        return acquisitionCost+shipToAZ+(azCommission*book.getAzUsedPrice())+listFee+shipToUPurchaser+tax;
     }
 
     /**

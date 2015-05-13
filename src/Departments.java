@@ -2,7 +2,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -59,7 +58,7 @@ public class Departments {
     }
 
     /**
-     * makes uniqueBooks Array available to other methods
+     * Makes uniqueBooks Array available to other methods
      * @return ArrayList of Book Objects
      */
     public ArrayList<Book> getUniqueBooks(){
@@ -67,7 +66,6 @@ public class Departments {
     }
 
     /**
-     *
      * @return formatted term code for example s15 for spring of 2015.  This is used in the URL to WWU Bookstore
      */
     public String getTerm(){
@@ -107,6 +105,30 @@ public class Departments {
         }
         return null;
     }
+    //WORKING HERE
+
+    public PriorityQueue<Book> getPriorityQueueByROISellingOnAz(final double mark){
+        if (uniqueBooks.size()>0){
+            Comparator<Book> bookComparator= new Comparator<Book>() {
+                @Override
+                public int compare(Book o1, Book o2) {
+                    if (o1==null) return -1;
+                    if (o2==null) return 1;
+                    if (o1 ==null && o2==null)return 0;
+                    double roiBook1=Actions.calcROISellingOnAz(o1, mark);
+                    double roiBook2=Actions.calcROISellingOnAz(o2, mark);
+                    if (roiBook1<roiBook2) return -1;
+                    if (roiBook1 ==roiBook2) return 0;
+                    else return 1;
+                }
+            };
+            PriorityQueue<Book> priorityQueue= new PriorityQueue<Book>(bookComparator.reversed());
+            priorityQueue.addAll(uniqueBooks);
+            return priorityQueue;
+        }
+        return null;
+    }
+
 
     /**
      * Orders Book objects from greatest to least based on Return on investment if bought on amazon and sold to the
@@ -579,6 +601,14 @@ public class Departments {
             e.printStackTrace();
         }
         return true;
+    }
+
+    public List<Book>getBooksByDepartment(String department){
+        if (departments.containsKey(department)) {
+            Department target = departments.get(department);
+            return getBooksByDepartment(target);
+        }
+        return null;
     }
 
     public List<Book> getBooksByDepartment(Department department){
