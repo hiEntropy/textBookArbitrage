@@ -2,7 +2,6 @@
  * Created by Austin on 3/8/2015.
  */
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -27,6 +26,9 @@ public class Actions {
         }
         if(term.toLowerCase().equals("fall")){
             query="F"+year.substring(2,year.length());
+        }
+        if(term.toLowerCase().equals("summer")){
+            query="X"+year.substring(2,year.length());
         }
         return query;
     }
@@ -57,9 +59,8 @@ public class Actions {
     }
 
     /**
-     *This method used the JSONObject and JSONArray classes provided by java to represent JSON text.  This method
-     * has the ability to extract JSON values and keys from a specified target tag regardless of whether the target is
-     * an element within an object or an entire JSONArray.
+     *This method uses the JSONObject and JSONArray classes provided by java to represent JSON text.  This method
+     * has the ability to extract JSON values and keys from a specified target tag regardless of position or type
      * @param jsonObject Must be of the JSONObject class found here http://www.json.org/javadoc/org/json/JSONObject.html
      * @param target this is a String representing the tagName of the element, object or array in the JSONArray, or
      *               JSONObject
@@ -103,10 +104,10 @@ public class Actions {
                         }
                     }
                 }
-                if (isJSONObject(jsonObject.getString(key))){//if it an object send it to the parseJSON that takes a JSONObject
+                if (isJSONObject(jsonObject.getString(key))){//if its an object send it to the parseJSON that takes a JSONObject
                     parseJSON(jsonObject.getJSONObject(key),target,list);
                 }
-                if (isJSONArray(jsonObject.getString(key))){//if it an object send it to the parseJSON that takes a JSONArray
+                if (isJSONArray(jsonObject.getString(key))){//if its an object send it to the parseJSON that takes a JSONArray
                     parseJSON(jsonObject.getJSONArray(key),target,list);
                 }
             }
@@ -414,6 +415,7 @@ public class Actions {
         }
         return book.getLowestAZPrice();
     }
+
     /**
      * It will crash if you send it a null book
      * @param book
@@ -425,7 +427,7 @@ public class Actions {
         double trackingCost=1.05;//USPS tracking costs
         double envelope=1.89;//USPS cost to buy a bubble wrapped shipping envelope
         double tax=acquisitionCost*.087;
-        double commission=book.getLowestAZPrice()*.945*.15;
+        double commission=setMyAzSalePrice(book,.055)*.15;
         double listFee=.99;
         return acquisitionCost+shippingCost+trackingCost+envelope+tax+commission+listFee;
     }
@@ -435,9 +437,9 @@ public class Actions {
         double shipToAZ=3.99;
         double azCommission=.15;
         double listFee=.99;
-        double shipToUPurchaser=14.99;
+        double shipToPurchaser=14.99;
         double tax=book.getWwuUsedPrice()*.087;
-        return acquisitionCost+shipToAZ+(azCommission*book.getAzUsedPrice())+listFee+shipToUPurchaser+tax;
+        return acquisitionCost+shipToAZ+(azCommission*book.getAzUsedPrice())+listFee+shipToPurchaser+tax;
     }
 
     /**
@@ -492,8 +494,8 @@ public class Actions {
     }
 
     /**
-     * checks to see if a file exists by making sure that it isn't a directory and that it does infact exist
-     * @param value
+     * checks to see if a file exists by making sure that it isn't a directory and that it does in fact exist
+     * @param value String value representing the location of the file
      * @return true if the file exists and isn't a directory and returns false if either of those parameters are false
      */
     public static boolean fileExists(String value){

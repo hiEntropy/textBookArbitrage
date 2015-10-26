@@ -8,8 +8,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="org.json:org.json:2.0" level="project" />
-    <orderEntry type="library" name="org.json-20120521" level="project" />
-    <orderEntry type="library" name="junit:junit:4.111" level="project" />
+    <orderEntry type="library" name="org.json:org.json:2.01" level="project" />
+    <orderEntry type="library" name="junit:junit:4.11" level="project" />
+    <orderEntry type="library" name="apache-codec:commons-codec:1.2" level="project" />
   </component>
 </module>

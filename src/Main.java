@@ -16,9 +16,10 @@ public class Main {
                 departments=new Departments(term,year);
                 Reports report=new Reports(departments);
                 departments.load(fileName);
-                report.reportROIRanks();
+                report.reportROISellingToWwuBestCase();
                 report.reportROISellingOnAz();
                 report.reportDepartmentBoxAndWhisker();
+                report.pricedDifferences();
                 System.out.println("Data for "+term+" "+year+" successfully loaded.");
             }
             if (userInput.equals("2")){
@@ -31,8 +32,9 @@ public class Main {
                 System.out.println("Beginning... You may want to go do something else while I work");
                 departments.requestDataFromWWU();
                 departments.getAmazonPrices();
-                report.reportROIRanks();
+                report.reportROISellingToWwuBestCase();
                 report.reportROISellingOnAz();
+                report.pricedDifferences();
             }
 
             if (userInput.equals("3")){
@@ -47,8 +49,9 @@ public class Main {
                 System.out.println("Getting prices from Amazon");
                 departments.getAmazonPricesFromLoad();
                 System.out.println("Generating Reports");
-                report.reportROIRanks();
+                report.reportROISellingToWwuBestCase();
                 report.reportROISellingOnAz();
+                report.pricedDifferences();
                 long endTime=System.nanoTime();
                 System.out.println("Completed in "+String.valueOf((endTime-startTime)/60000000000.00)+" minutes");//converts to minutes
             }

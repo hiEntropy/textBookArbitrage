@@ -11,7 +11,8 @@ import java.util.*;
  of the organization chart for modeling the structure at WWU.
  The structure is Departments--->Department---->Course--->Section--->Book
  Every Department object has a map of Course Objects, every Course Object has a map of Section Objects, every Section Object
- has a map of Book Objects.
+ has a map of Book Objects.  It is easiest to think of this as a giant tree.  the Departments class is a sort of root with
+ many many paths out.  from the Departments class any position can be reached.
 
  Departments Class contains the functions that are responsible for data collection because it is the head of the
  organization chart allowing it easy top down access to every level of data.
@@ -129,7 +130,6 @@ public class Departments {
         return null;
     }
 
-
     /**
      * Orders Book objects from greatest to least based on Return on investment if bought on amazon and sold to the
      * wwu Bookstore at the maximum payoff minus shipping of 3.99
@@ -172,13 +172,13 @@ public class Departments {
         System.out.println("Sections Loaded "+sectionsStatus);
         boolean booksStatus= populatedBooksFromWWU();
         System.out.println("Books Loaded "+booksStatus);
-        boolean saveStatus=Actions.save(holder.toString(),"S15.txt");
+        boolean saveStatus=Actions.save(holder.toString(),term+".txt");
         System.out.println("Content Saved "+saveStatus);
     }
 
     /**
      * Adds a new department to the map of Department Objects called departments
-     * @param value Deptartment object
+     * @param value Department object
      * @return true if successfully added false otherwise
      */
     public boolean addDepartment(Department value){
@@ -264,10 +264,10 @@ public class Departments {
                         while(booksIterator.hasNext()){
                             Map.Entry bookPair=(Map.Entry) booksIterator.next();
                             currentBook=(Book)bookPair.getValue();
-                            if (!uniqueBooks.contains(currentBook)) {
+                            if (uniqueBooks.contains(currentBook)) {
                                 try {
                                     Amazon amazon = new
-                                            Amazon(currentBook.getIsbn(), "apiKey", "awsKey");
+                                            Amazon(currentBook.getIsbn(), "", "");
                                     amazon.queryAmazon();
                                     currentBook.setAzUsedPrice(amazon.getLowestUsedPrice());
                                     currentBook.addHistoricPriceAz(amazon.getLowestUsedPrice());
@@ -277,15 +277,15 @@ public class Departments {
                                     booksQueried+=1;
                                     addToUniqueBooks(currentBook);
                                     save(currentBook);
-                                    System.out.println(booksQueried);
-
+                                    if (booksQueried%50==0) {
+                                        System.out.println(booksQueried + " books queried");
+                                    }
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }catch (Exception e){
                                     e.printStackTrace();
                                 }
                             }
-                            System.out.println(booksQueried+" books queried");
                         }
                     }
                 }
@@ -304,9 +304,9 @@ public class Departments {
         if (uniqueBooks==null)return;
         for (int book=0;book<uniqueBooks.size();book++) {
             Book currentBook=uniqueBooks.get(book);
-            try {
-                Amazon amazon = new
-                        Amazon(currentBook.getIsbn(), "apiKey", "awsKey");
+            try {//ehaUHhgcm3SaKU9Piejffq41OLm9gJtFKrns6Ncl
+                Amazon amazon = new//the really long key goes first
+                        Amazon(currentBook.getIsbn(), "ehaUHhgcm3SaKU9Piejffq41OLm9gJtFKrns6Ncl", "AKIAIZJ4MJ52B5F4JKXQ");
                 amazon.queryAmazon();
                 currentBook.setAzUsedPrice(amazon.getLowestUsedPrice());
                 currentBook.setAzNewPrice(amazon.getLowestNewPrice());
@@ -582,6 +582,12 @@ public class Departments {
                                             newBookPrice = list.get(listIndex).get("salePrice");
                                         }
                                     }
+                                    if(newBookPrice==null){
+                                        newBookPrice="-1";
+                                    }
+                                    if (usedBookPrice==null){
+                                        usedBookPrice="-1";
+                                    }
                                     Book currentBook = new Book(title, sku, Actions.bookStatus(bookStatus),
                                             Double.valueOf(newBookPrice), Double.valueOf(usedBookPrice), currentSection);
                                     currentSection.addBook(currentBook);
@@ -639,7 +645,7 @@ public class Departments {
      * @param book
      */
     private void addToUniqueBooks(Book book){
-        if (!uniqueBooks.contains(book) && uniqueBooks!=null){
+        if (uniqueBooks!=null && book!=null && !uniqueBooks.contains(book)){
             uniqueBooks.add(book);
             bookCount+=1;
         }

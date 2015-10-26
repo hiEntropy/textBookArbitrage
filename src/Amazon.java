@@ -72,17 +72,21 @@ public class Amazon{
     }
 
     /**
-     * procedural method uses the inspectXML() to extract the necessary data then assigns the new data to the appropriate
-     * variable
+     * procedural method uses the Actions.inspectXML() to extract the necessary data then assigns the new data to the
+     * appropriate variable
      * @param response
      */
     private void getPrices(Document response){
         Actions.inspectXML(response.getChildNodes(), "LowestUsedPrice", "Amount",prices);
-        lowestUsedPrice=Actions.lowestNumber(prices);
-        prices.clear();
+        if(prices.size()>0) {
+            lowestUsedPrice = Actions.lowestNumber(prices);
+            prices.clear();
+        }
         Actions.inspectXML(response.getChildNodes(), "LowestNewPrice", "Amount",prices);
-        lowestNewPrice=Actions.lowestNumber(prices);
-        prices.clear();
+        if(prices.size()>0) {
+            lowestNewPrice = Actions.lowestNumber(prices);
+            prices.clear();
+        }
     }
 
     public double getLowestUsedPrice(){
